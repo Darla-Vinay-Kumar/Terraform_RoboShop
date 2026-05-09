@@ -3,7 +3,6 @@ resource "aws_instance" "mongodb" {
     instance_type = "t3.micro"
     vpc_security_group_ids = [local.mongodb_sg_id]
     subnet_id = local.database_subnet_id
-    associate_public_ip_address = true
 
     tags = merge(
         local.common_tags,
@@ -33,8 +32,51 @@ resource "terraform_data" "mongodb" {
 
     provisioner "remote-exec" {
         inline = [
+
             "chmod +x /tmp/bootstrap.sh",
-            "sudo sh /tmp/bootstrap.sh"
+            "sudo sh /tmp/bootstrap.sh mongodb"
+            
+        ]
+    }
+}
+
+resource "aws_instance" "redis" {
+    ami = local.ami_id
+    instance_type = "t3.micro"
+    vpc_security_group_ids = [local.redis_sg_id]
+    subnet_id = local.database_subnet_id
+
+    tags = merge(
+        local.common_tags,
+        {
+            Name = "${var.project_name}-${var.environment}-redis"
+        }
+    )
+    
+}
+
+resource "terraform_data" "redis" {
+    triggers_replace = [
+        aws_instance.redis.id
+    ]
+
+    connection {
+      type = "ssh"
+      user = "ec2-user"
+      password = "DevOps321"
+      host = aws_instance.redis.private_ip
+    }
+    # terraform copies this files to the monhgodb instance and then executes the commands mentioned in remote-exec
+    provisioner "file" {
+       source = "bootstrap.sh"
+         destination = "/tmp/bootstrap.sh"
+    }
+
+    provisioner "remote-exec" {
+        inline = [
+
+            "chmod +x /tmp/bootstrap.sh",
+            "sudo sh /tmp/bootstrap.sh redis"
             
         ]
     }
