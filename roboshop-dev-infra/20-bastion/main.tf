@@ -5,6 +5,8 @@ resource "aws_instance" "bastion" {
     subnet_id = local.public_subnet_id
     associate_public_ip_address = true
 
+    user_data = file("bastion.sh")
+
     tags = merge(
         local.common_tags,
         {
