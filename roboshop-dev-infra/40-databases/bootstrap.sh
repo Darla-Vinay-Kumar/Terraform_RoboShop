@@ -1,5 +1,6 @@
 #!/bin/bash
 component=$1
+Environment=$2
 dnf install ansible -y
 #ansible-pull -U https://github.com/Darla-Vinay-Kumar/Ansible_Roboshop_Roles-tf.git -e component=$component main.yml -i inventory.ini
 REPO_URL="https://github.com/Darla-Vinay-Kumar/Ansible_Roboshop_Roles-tf.git"
@@ -23,4 +24,4 @@ else
     cd $ANSIBLE_DIR
 fi
 
-ansible-playbook -e component=$component main.yml -i inventory.ini &>> /var/log/roboshop/ansible.log
+ansible-playbook -e component=$component -e environment=$Environment main.yml -i inventory.ini &>> /var/log/roboshop/ansible.log
