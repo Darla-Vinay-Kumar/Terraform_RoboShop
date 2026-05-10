@@ -23,4 +23,4 @@ else
     cd $ANSIBLE_DIR
 fi
 
-ansible -playbook -e component=$component main.yml -i inventory.ini &>> /var/log/roboshop/ansible.log
+ansible-playbook -e component=$component main.yml -i inventory.ini &>> /var/log/roboshop/ansible.log
